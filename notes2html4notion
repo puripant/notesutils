@@ -124,7 +124,7 @@ def render_html(note,attachments={}):
                     tag = ['ul','ul','ol','ul'][pstyle - 100]
                     par = rval
                     while indent > 0:
-                        last = par.getchildren()[-1]
+                        last = list(par)[-1]
                         if last.tag != tag:
                             break
                         par = last
@@ -345,9 +345,12 @@ if __name__ == '__main__':
     for id,data in db.execute(nquery):
         pb = decompress(data,47)
         doc = parse(pb,s_doc)['version'][0]['data']
+        
+        title = doc['string'].split('\n')[0].replace('/', '|')
+        
         section = render_html(doc,attachments)
         section.tag = 'section'
         hdoc = E('html',E('head',E('style',css)),E('body',section))
-        write(ET.tostring(hdoc,method='html'),dest,f'{id}.html')
+        write(ET.tostring(hdoc,method='html'),dest,f'{title}.html')
 
     print(f"wrote files to {dest} directory")
